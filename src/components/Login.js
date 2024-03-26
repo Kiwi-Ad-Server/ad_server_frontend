@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Register } from "./Register";
+import "./Login.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -35,6 +37,9 @@ const Login = () => {
         required
       />
       <button type="submit">Login</button>
+      <div>
+      <p> Don't have an account yet? <button onClick={() => navigate("/register")}>Register</button></p>
+      </div>
     </form>
   );
 };

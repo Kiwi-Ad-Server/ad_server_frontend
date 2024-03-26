@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { Login } from "./Login";
 
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const { register } = useAuth();
+  let navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +28,6 @@ const Register = () => {
         onChange={(e) => setUsername(e.target.value)}
       />
       <input
-      
         type="email"
         placeholder="Email"
         value={email}
@@ -39,6 +40,14 @@ const Register = () => {
         onChange={(e) => setPassword(e.target.value)}
       />
       <button type="submit">Register</button>
+
+      <div>
+        <p>
+          {" "}
+          Already have an account?{" "}
+          <button onClick={() => navigate("/login")}>Login</button>
+        </p>
+      </div>
     </form>
   );
 };
