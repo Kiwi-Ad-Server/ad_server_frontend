@@ -1,24 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Register } from "./Register";
-import "./Login.css";
 
 const Login = () => {
+  // State hooks for managing email and password input fields
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useAuth();
+  // Destructuring login function from the useAuth hook
+  const { login, authData } = useAuth();
+  // Hook for navigation
   let navigate = useNavigate();
 
+  useEffect(() => {
+    // If authData is updated and contains user data, redirect the user
+    if (authData) {
+      // Redirect based on the user's role
+      const path = getRedirectPath(authData.role);
+      navigate(path);
+    }
+  }, [authData, navigate]); // Re-run when authData or navigate changes
+
+  const getRedirectPath = (role) => {
+    switch (role) {
+      case "Admin":
+        return "/admin-dashboard";
+      case "Advertiser":
+        return "/advertiser-dashboard";
+      case "Publisher":
+        return "/publisher-dashboard";
+      default:
+        return "/";
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(email, password); // useAuth hook provides login
-      // Redirect based on role, stored in authData within useAuth
-      navigate("/advertiser-dashboard"); // Placeholder, adjust based on actual role logic
+      console.log("Attempting login"); // Debug log
+      await login(email, password);
+      console.log("Login successful"); // Debug log
     } catch (error) {
       console.error("Login failed: ", error);
-      // Optionally, handle login failure (e.g., show error message)
     }
   };
 
@@ -26,19 +47,26 @@ const Login = () => {
     <form onSubmit={handleSubmit}>
       <input
         type="email"
+        placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
       />
       <input
         type="password"
+        placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
       />
       <button type="submit">Login</button>
       <div>
-      <p> Don't have an account yet? <button onClick={() => navigate("/register")}>Register</button></p>
+        <p>
+          Don't have an account yet?
+          <button type="button" onClick={() => navigate("/register")}>
+            Register
+          </button>
+        </p>
       </div>
     </form>
   );
