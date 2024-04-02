@@ -1,7 +1,6 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-
+import { useAuth } from "../../context/AuthContext";
 /**
  * A component that wraps around routes that require authentication.
  * Redirects to the login page if no user is logged in.
