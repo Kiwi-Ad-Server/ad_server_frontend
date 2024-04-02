@@ -5,13 +5,13 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import ProtectedRoute from "./components/PrivateRoute";
+import ProtectedRoute from "./components/auth/PrivateRoute";
 import {
   AdminDashboard,
   AdvertiserDashboard,
   PublisherDashboard,
 } from "./pages";
-import { Login, Register } from "./components";
+import { Login, Register } from "./components/auth";
 // import {PublisherDashboard} from "./pages/PublisherDashboard";
 
 function App() {

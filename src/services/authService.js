@@ -1,38 +1,54 @@
 import axios from "axios";
 
-// Base URL for the auth-related API endpoints
-const API_URL = "http://localhost:5000/api/auth/";
+// Axios instance specific to the auth service
+const axiosInstance = axios.create({
+  baseURL: "http://localhost:5000/api/auth/",
+  withCredentials: true, // Assuming credentials are needed for all requests
+});
 
 const authService = {
-  // Function to handle user registration
-  register: (username, email, password) => {
-    // Send a POST request to the register endpoint
-    return axios.post(`${API_URL}register`, {
-      username,
-      email,
-      password,
-    });
+  // Async function to handle user registration
+  register: async (data) => {
+    try {
+      const response = await axiosInstance.post("register", data);
+      return response.data; // Assuming the response data is directly usable
+    } catch (error) {
+      // Consider logging the error to an external service
+      throw new Error(error.response.data.message || "Registration failed");
+    }
   },
 
-  // Function to handle user login
-  login: (email, password) => {
-    // Send a POST request to the login endpoint
-    return axios.post(`${API_URL}login`, { email, password });
+  // Async function to handle user login
+  login: async (email, password) => {
+    try {
+      const response = await axiosInstance.post("login", { email, password });
+      // Optionally process response or directly return it
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message || "Login failed");
+    }
   },
 
-  // Function to handle user logout
-  logout: () => {
-    // Send a POST request to the logout endpoint
-    return axios.post(`${API_URL}logout`);
+  // Async function to handle user logout
+  logout: async () => {
+    try {
+      const response = await axiosInstance.post("logout");
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message || "Logout failed");
+    }
   },
 
-  // Function to validate the current session
-  validateSession: () => {
-    // Send a GET request to the session validation endpoint
-    // and return user data if successful
-    return axios
-      .get(`${API_URL}validate-session`, { withCredentials: true })
-      .then((response) => response.data.user);
+  // Async function to validate the current session
+  validateSession: async () => {
+    try {
+      const response = await axiosInstance.get("validate-session");
+      return response.data.user; // Assuming the user's info is what's needed
+    } catch (error) {
+      throw new Error(
+        error.response.data.message || "Session validation failed"
+      );
+    }
   },
 };
 
