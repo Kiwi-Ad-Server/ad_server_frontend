@@ -34,10 +34,18 @@ const UserSidebar = () => {
   // Determine the menus to show based on user type
   const userMenus = authData ? menus[authData.role] : [];
 
+  const menuStyle = {
+    marginTop: "30px", // Margin at the top of the first menu item
+  };
+
   return (
-    <Sidebar as={Menu} icon="labeled" vertical visible width="wide">
+    <Sidebar as={Menu} vertical visible style={{ width: "300px" }}>
       {userMenus.map((menu, index) => (
-        <Menu.Item key={index} onClick={() => handleItemClick(menu.path)}>
+        <Menu.Item
+          key={index}
+          onClick={() => handleItemClick(menu.path)}
+          style={index === 0 ? menuStyle : null}
+        >
           <Icon name={menu.icon} />
           {menu.name}
         </Menu.Item>

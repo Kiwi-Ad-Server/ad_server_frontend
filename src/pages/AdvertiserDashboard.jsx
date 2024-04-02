@@ -184,7 +184,7 @@ const AdvertiserDashboard = () => {
           {/* More account settings options */}
         </Segment>
         <Segment>
-          <h2>Account Settings</h2>
+          <h2>Some Other Settings Or Whatever</h2>
           <Button icon labelPosition="left" primary>
             <Icon name="settings" />
             Edit Profile
@@ -196,7 +196,7 @@ const AdvertiserDashboard = () => {
           {/* More account settings options */}
         </Segment>
         <Segment>
-          <h2>Account Settings</h2>
+          <h2>Other Settings</h2>
           <Button icon labelPosition="left" primary>
             <Icon name="settings" />
             Edit Profile
@@ -205,45 +205,8 @@ const AdvertiserDashboard = () => {
             <Icon name="credit card" />
             Payment Methods
           </Button>
-          {/* More account settings options */}
+          {/* More account settings options if you want */}
         </Segment>
-        <Segment>
-          <h2>Account Settings</h2>
-          <Button icon labelPosition="left" primary>
-            <Icon name="settings" />
-            Edit Profile
-          </Button>
-          <Button icon labelPosition="left">
-            <Icon name="credit card" />
-            Payment Methods
-          </Button>
-          {/* More account settings options */}
-        </Segment>
-        <Segment>
-          <h2>Account Settings</h2>
-          <Button icon labelPosition="left" primary>
-            <Icon name="settings" />
-            Edit Profile
-          </Button>
-          <Button icon labelPosition="left">
-            <Icon name="credit card" />
-            Payment Methods
-          </Button>
-          {/* More account settings options */}
-        </Segment>
-        <Segment>
-          <h2>Account Settings</h2>
-          <Button icon labelPosition="left" primary>
-            <Icon name="settings" />
-            Edit Profile
-          </Button>
-          <Button icon labelPosition="left">
-            <Icon name="credit card" />
-            Payment Methods
-          </Button>
-          {/* More account settings options */}
-        </Segment>
-
         {/* More segments can be added here */}
       </Grid.Column>
 
@@ -254,6 +217,7 @@ const AdvertiserDashboard = () => {
         >
           <Segment>
             <h2>Notifications</h2>
+            <p>Your campaign "Example Campaign" is nearing its budget limit.</p>
             <p>Your campaign "Example Campaign" is nearing its budget limit.</p>
             <p>Your campaign "Example Campaign" is nearing its budget limit.</p>
 
