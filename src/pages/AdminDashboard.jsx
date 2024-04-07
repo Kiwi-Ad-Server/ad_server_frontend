@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Grid,
   Segment,
@@ -12,17 +12,20 @@ import {
   StatisticLabel,
 } from "semantic-ui-react";
 import AppLayout from "../components/AppLayout";
+import APIService from "../services/api.service";
 import { useAuth } from "../context/AuthContext";
 
 function AdminDashboard() {
+  const [users, setUsers] = useState([]);
+  const apiService = new APIService("http://localhost:5000/api");
   const { authData } = useAuth();
 
-  // Mock data - replace with your data fetching logic
-  const users = [
-    { id: 1, name: "John Doe", role: "Advertiser" },
-    { id: 2, name: "Jane Doe", role: "Publisher" },
-  ];
+  useEffect(() => {
+    const subscription = apiService.subscribeToData("users", setUsers);
+    return () => subscription.unsubscribe(); // Clean up subscription
+  }, []);
 
+  // Mock data - replace with your data fetching logic
   const financialSummary = {
     totalRevenue: 12000,
     totalPayout: 8000,
@@ -48,6 +51,17 @@ function AdminDashboard() {
     },
   ];
 
+  const handleDeleteUser = async (userId) => {
+    try {
+      await apiService.deleteData("users", userId);
+      // Optionally refetch the user list or filter out the deleted user from state
+      setUsers(users.filter((user) => user.id !== userId));
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      // Handle error (e.g., show an error message)
+    }
+  };
+
   return (
     <AppLayout>
       <Grid container style={{ padding: "20px" }}>
@@ -66,38 +80,6 @@ function AdminDashboard() {
         <Grid.Row columns={2}>
           <Grid.Column>
             <Segment>
-              <Header as="h3">User Management</Header>
-              <Table celled>
-                <Table.Header>
-                  <Table.Row>
-                    <Table.HeaderCell>ID</Table.HeaderCell>
-                    <Table.HeaderCell>Name</Table.HeaderCell>
-                    <Table.HeaderCell>Role</Table.HeaderCell>
-                    <Table.HeaderCell>Actions</Table.HeaderCell>
-                  </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                  {users.map((user) => (
-                    <Table.Row key={user.id}>
-                      <Table.Cell>{user.id}</Table.Cell>
-                      <Table.Cell>{user.name}</Table.Cell>
-                      <Table.Cell>{user.role}</Table.Cell>
-                      <Table.Cell>
-                        <Button icon>
-                          <Icon name="edit" />
-                        </Button>
-                        <Button icon>
-                          <Icon name="delete" />
-                        </Button>
-                      </Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table>
-            </Segment>
-          </Grid.Column>
-          <Grid.Column>
-            <Segment>
               <Header as="h3">Financial Summary</Header>
               <Statistic size="mini">
                 <StatisticValue>
@@ -114,7 +96,8 @@ function AdminDashboard() {
                 <StatisticLabel>Net Profit</StatisticLabel>
               </Statistic>
             </Segment>
-
+          </Grid.Column>
+          <Grid.Column>
             <Segment>
               <Header as="h3">Campaign Overview</Header>
               <List divided relaxed>
@@ -131,6 +114,43 @@ function AdminDashboard() {
                   </List.Item>
                 ))}
               </List>
+            </Segment>
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column>
+            <Segment>
+              <Header as="h3">User Management</Header>
+              <Table celled>
+                <Table.Header>
+                  <Table.Row>
+                    <Table.HeaderCell>Name</Table.HeaderCell>
+                    <Table.HeaderCell>Email</Table.HeaderCell>
+                    <Table.HeaderCell>Role</Table.HeaderCell>
+                    <Table.HeaderCell>Actions</Table.HeaderCell>
+                  </Table.Row>
+                </Table.Header>
+                <Table.Body>
+                  {users.map((user) => (
+                    <Table.Row key={user.id}>
+                      <Table.Cell>{user.username}</Table.Cell>
+                      <Table.Cell>{user.email}</Table.Cell>
+                      <Table.Cell>{user.role}</Table.Cell>
+                      <Table.Cell>
+                        <Button icon>
+                          <Icon name="edit" />
+                        </Button>
+                        <Button icon>
+                          <Icon
+                            name="trash"
+                            onClick={() => handleDeleteUser(user._id)}
+                          />
+                        </Button>
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table>
             </Segment>
           </Grid.Column>
         </Grid.Row>

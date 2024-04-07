@@ -9,6 +9,7 @@ import {
   Statistic,
   StatisticValue,
   StatisticLabel,
+  Table,
 } from "semantic-ui-react";
 import AppLayout from "../components/AppLayout";
 import { useAuth } from "../context/AuthContext";
@@ -26,6 +27,17 @@ function PublisherDashboard() {
     totalClicks: 25000,
     clickThroughRate: "5%",
   };
+
+  const revenueSummary = {
+    lastMonth: 1200,
+    thisMonth: 1500,
+    projectedNextMonth: 1800,
+  };
+
+  const requests = [
+    { id: 1, date: "2024-03-01", type: "New Ad Zone", status: "Pending" },
+    { id: 2, date: "2024-03-05", type: "Rate Adjustment", status: "Approved" },
+  ];
 
   return (
     <AppLayout>
@@ -87,6 +99,60 @@ function PublisherDashboard() {
                 </StatisticValue>
                 <StatisticLabel>Click-Through Rate</StatisticLabel>
               </Statistic>
+            </Segment>
+          </Grid.Column>
+        </Grid.Row>
+
+        {/* Revenue Reports */}
+        <Grid.Row columns={1}>
+          <Grid.Column>
+            <Segment>
+              <Header as="h3">Revenue Reports</Header>
+              <Statistic.Group widths="three">
+                <Statistic size="small">
+                  <StatisticValue>${revenueSummary.lastMonth}</StatisticValue>
+                  <StatisticLabel>Last Month</StatisticLabel>
+                </Statistic>
+                <Statistic size="small">
+                  <StatisticValue>${revenueSummary.thisMonth}</StatisticValue>
+                  <StatisticLabel>This Month</StatisticLabel>
+                </Statistic>
+                <Statistic size="small">
+                  <StatisticValue>
+                    ${revenueSummary.projectedNextMonth}
+                  </StatisticValue>
+                  <StatisticLabel>Projected Next Month</StatisticLabel>
+                </Statistic>
+              </Statistic.Group>
+            </Segment>
+          </Grid.Column>
+        </Grid.Row>
+
+        {/* Request & Inquiries */}
+        <Grid.Row columns={1}>
+          <Grid.Column>
+            <Segment>
+              <Header as="h3">Requests & Inquiries</Header>
+              <Table celled>
+                <Table.Header>
+                  <Table.Row>
+                    <Table.HeaderCell>ID</Table.HeaderCell>
+                    <Table.HeaderCell>Date</Table.HeaderCell>
+                    <Table.HeaderCell>Type</Table.HeaderCell>
+                    <Table.HeaderCell>Status</Table.HeaderCell>
+                  </Table.Row>
+                </Table.Header>
+                <Table.Body>
+                  {requests.map((request) => (
+                    <Table.Row key={request.id}>
+                      <Table.Cell>{request.id}</Table.Cell>
+                      <Table.Cell>{request.date}</Table.Cell>
+                      <Table.Cell>{request.type}</Table.Cell>
+                      <Table.Cell>{request.status}</Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table>
             </Segment>
           </Grid.Column>
         </Grid.Row>
