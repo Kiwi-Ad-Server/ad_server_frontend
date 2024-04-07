@@ -51,6 +51,11 @@ const AppLayout = ({ children }) => {
         path: "/advertiser-dashboard",
       },
       {
+        name: "Adverts",
+        icon: <Icon name="buysellads" />,
+        path: "/advertiser-adverts",
+      },
+      {
         name: "Campaigns",
         icon: <Icon name="bullhorn" />,
         path: "/advertiser-campaigns",

@@ -6,6 +6,7 @@ import { fetchCampaigns, createCampaign } from "../services/campaignService";
 import AS_MODAL from "../shared/AS_MODAL";
 import CampaignForm from "./Forms/CampaignForm";
 import AppLayout from "../components/AppLayout";
+import APIService from "../services/api.service";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -70,17 +71,14 @@ const conversionRateData = {
 };
 
 const AdvertiserDashboard = () => {
-  const { authData } = useAuth();
   const [campaigns, setCampaigns] = useState([]);
+  const apiService = new APIService("http://localhost:5000/api");
+  const { authData } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const fetchAndSetCampaigns = async () => {
-      const fetchedCampaign = await fetchCampaigns();
-      setCampaigns(fetchedCampaign); // Update state
-    };
-
-    fetchAndSetCampaigns();
+    const subscription = apiService.subscribeToData("campaigns", setCampaigns);
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleCreateCampaign = async (campaignData) => {
@@ -111,13 +109,7 @@ const AdvertiserDashboard = () => {
   return (
     <>
       <AppLayout>
-        {/* <NavigationBar username={authData.username} /> */}
-        {/* Center Sidebar  */}
         <Grid style={{ padding: "10px" }}>
-          {/* <Grid.Column width={3}>
-          <UserSidebar />
-        </Grid.Column> */}
-
           {/* Center Sidebar  */}
           <Grid.Column stretched width={12}>
             <Segment>
@@ -151,25 +143,28 @@ const AdvertiserDashboard = () => {
                     <Table.HeaderCell>Impressions</Table.HeaderCell>
                     <Table.HeaderCell>Clicks</Table.HeaderCell>
                     <Table.HeaderCell>Conversions</Table.HeaderCell>
-                    <Table.HeaderCell>Budget</Table.HeaderCell>
+                    <Table.HeaderCell>Budget(N$)</Table.HeaderCell>
                     <Table.HeaderCell>Actions</Table.HeaderCell>
                   </Table.Row>
                 </Table.Header>
 
                 <Table.Body>
                   {/* Replace this section with dynamic campaign data */}
-                  <Table.Row>
-                    <Table.Cell>Example Campaign</Table.Cell>
-                    <Table.Cell>Active</Table.Cell>
-                    <Table.Cell>10,000</Table.Cell>
-                    <Table.Cell>500</Table.Cell>
-                    <Table.Cell>50</Table.Cell>
-                    <Table.Cell>$1000</Table.Cell>
-                    <Table.Cell>
-                      <Button size="small">Edit</Button>
-                      <Button size="small">Pause</Button>
-                    </Table.Cell>
-                  </Table.Row>
+                  {campaigns.map((campaign) => (
+                    <Table.Row key={campaign._id}>
+                      <Table.Cell>{campaign.name}</Table.Cell>
+
+                      <Table.Cell>{campaign.status}</Table.Cell>
+                      <Table.Cell>{campaign.impressions}</Table.Cell>
+                      <Table.Cell>{campaign.clicks}</Table.Cell>
+                      <Table.Cell>{campaign.conversions}</Table.Cell>
+                      <Table.Cell>{campaign.budget}</Table.Cell>
+                      <Table.Cell>
+                        <Button size="small">Edit</Button>
+                        <Button size="small">Pause</Button>
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
                 </Table.Body>
               </Table>
             </Segment>
