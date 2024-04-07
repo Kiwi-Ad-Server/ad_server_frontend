@@ -1,6 +1,5 @@
 import React from "react";
 import { Loader, Dimmer } from "semantic-ui-react";
-import "semantic-ui-css/semantic.min.css";
 
 /**
  * Shared Loader component for application-wide use.
@@ -13,11 +12,11 @@ import "semantic-ui-css/semantic.min.css";
  * @param {string} props.className Additional class names for the Loader.
  */
 const AS_LOADER = ({
-  active = true, 
-  size = "large", 
-  content = "Loading...", 
-  inverted = true, 
-  className = "", 
+  active = true,
+  size = "large",
+  content = "Loading...",
+  inverted = true,
+  className = "",
 }) => {
   return (
     <Dimmer active={active} inverted={inverted} className={className}>
