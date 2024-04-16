@@ -14,7 +14,7 @@ const USER_ROLES = {
 
 const AppLayout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const { authData } = useAuth();
+  const { authData, logout } = useAuth();
   let navigate = useNavigate();
 
   const userInitial = authData.username.charAt(0).toUpperCase();
@@ -88,6 +88,11 @@ const AppLayout = ({ children }) => {
     navigate(path);
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <Layout>
       <Sider trigger={null} collapsible collapsed={collapsed}>
@@ -148,7 +153,7 @@ const AppLayout = ({ children }) => {
                 <Icon name="setting" /> Settings
               </Dropdown.Item>
               <DropdownDivider />
-              <Dropdown.Item>
+              <Dropdown.Item onClick={handleLogout}>
                 <Icon name="sign-out" /> Logout
               </Dropdown.Item>
             </Dropdown.Menu>

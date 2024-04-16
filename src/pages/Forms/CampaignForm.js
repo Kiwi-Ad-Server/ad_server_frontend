@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import { Form, Button, Modal, Dropdown, Grid } from "semantic-ui-react";
-import APIService from "../../services/api.service"; // Ensure this path is correct
+import { Form, Button, Modal, Grid } from "semantic-ui-react";
+import AS_NOTIFY from "../../shared/AS_NOTIFY";
+import APIService from "../../services/api.service";
 
 const objectiveOptions = [
   { key: "awareness", text: "Brand Awareness", value: "Brand Awareness" },
   { key: "web_traffic", text: "Website traffic", value: "Website traffic" },
   { key: "lead_gen", text: "Lead Generation", value: "Lead Generation" },
   { key: "education", text: "Education", value: "Education" },
-
-  // Add more objectives as needed
 ];
 
 const CampaignDetailsForm = ({ onClose }) => {
@@ -23,7 +22,7 @@ const CampaignDetailsForm = ({ onClose }) => {
     duration: { start: "", end: "" },
   });
 
-  const apiService = new APIService("http://localhost:3000/api"); // Adjust your base API URL
+  const apiService = new APIService();
 
   const handleChange = (e, { name, value }) => {
     setCampaignDetails({ ...campaignDetails, [name]: value });
@@ -35,7 +34,8 @@ const CampaignDetailsForm = ({ onClose }) => {
         ...campaignDetails,
         interests: campaignDetails.interests.split(","),
       });
-      onClose(); // Close the modal on successful submission
+      AS_NOTIFY("success", "Campaigns successfully created");
+      onClose();
     } catch (error) {
       console.error("Error creating campaign:", error);
     }

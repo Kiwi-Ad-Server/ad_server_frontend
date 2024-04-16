@@ -10,8 +10,9 @@ import axios from "axios";
 import { BehaviorSubject } from "rxjs";
 
 class APIService {
-  constructor(baseURL) {
-    this.baseURL = baseURL;
+  constructor() {
+    this.baseURL = process.env.REACT_APP_API_BASE_URL;
+    axios.defaults.withCredentials = true;
     this.subjects = {};
   }
 
@@ -24,7 +25,9 @@ class APIService {
 
   async fetchData(endpoint) {
     try {
-      const response = await axios.get(`${this.baseURL}/${endpoint}`);
+      const response = await axios.get(`${this.baseURL}/${endpoint}`, {
+        withCredentials: true,
+      });
       this.getSubject(endpoint).next(response.data);
       return response.data;
     } catch (error) {
@@ -35,7 +38,9 @@ class APIService {
 
   async postData(endpoint, data) {
     try {
-      const response = await axios.post(`${this.baseURL}/${endpoint}`, data);
+      const response = await axios.post(`${this.baseURL}/${endpoint}`, data, {
+        withCredentials: true,
+      });
       this.fetchData(endpoint); // Refresh data after POST
       return response.data;
     } catch (error) {
@@ -48,7 +53,8 @@ class APIService {
     try {
       const response = await axios.patch(
         `${this.baseURL}/${endpoint}/${id}`,
-        data
+        data,
+        { withCredentials: true }
       );
       this.fetchData(endpoint); // Refresh data after PATCH
       return response.data;
@@ -60,7 +66,9 @@ class APIService {
 
   async deleteData(endpoint, id) {
     try {
-      const response = await axios.delete(`${this.baseURL}/${endpoint}/${id}`);
+      const response = await axios.delete(`${this.baseURL}/${endpoint}/${id}`, {
+        withCredentials: true,
+      });
       this.fetchData(endpoint); // Refresh data after DELETE
       return response.data;
     } catch (error) {
