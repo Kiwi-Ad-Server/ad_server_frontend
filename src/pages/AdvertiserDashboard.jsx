@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Line, Bar } from "react-chartjs-2";
-import { Grid, Button, Icon, Segment, Table } from "semantic-ui-react";
+import { Button, Grid, Icon, Message, Segment, Table } from "semantic-ui-react";
 import { useAuth } from "../context/AuthContext";
 import { fetchCampaigns, createCampaign } from "../services/campaignService";
 import AS_MODAL from "../shared/AS_MODAL";
+import AS_TABLE from "../shared/AS_TABLE";
 import CampaignForm from "./Forms/CampaignForm";
 import AppLayout from "../components/AppLayout";
 import APIService from "../services/api.service";
@@ -70,9 +71,54 @@ const conversionRateData = {
   ],
 };
 
+const columns = [
+  {
+    title: "Campaign Name",
+    dataIndex: "name",
+    key: "name",
+    searchable: true,
+  },
+  {
+    title: "Status",
+    dataIndex: "status",
+    key: "status",
+  },
+  {
+    title: "Impressions",
+    dataIndex: "impressions",
+    key: "impressions",
+    sortable: true,
+  },
+  {
+    title: "Clicks",
+    dataIndex: "clicks",
+    key: "clicks",
+  },
+  {
+    title: "Conversions",
+    dataIndex: "conversions",
+    key: "conversions",
+  },
+  {
+    title: "Budget(N$)",
+    dataIndex: "budget",
+    key: "budget",
+  },
+  {
+    title: "Actions",
+    key: "actions",
+    render: (_, record) => (
+      <Button.Group size="small">
+        <Button>Edit</Button>
+        <Button>Pause</Button>
+      </Button.Group>
+    ),
+  },
+];
+
 const AdvertiserDashboard = () => {
   const [campaigns, setCampaigns] = useState([]);
-  const apiService = new APIService("http://localhost:5000/api");
+  const apiService = new APIService();
   const { authData } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -85,11 +131,11 @@ const AdvertiserDashboard = () => {
     try {
       // Call the createCampaign service function
       await createCampaign(campaignData);
-
+  
       // Refetch campaigns to update the list
       const updatedCampaigns = await fetchCampaigns();
       setCampaigns(updatedCampaigns);
-
+  
       // Close the modal
       setIsModalOpen(false);
     } catch (error) {
@@ -97,7 +143,6 @@ const AdvertiserDashboard = () => {
       // Handle error (e.g., show error message)
     }
   };
-
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -107,121 +152,101 @@ const AdvertiserDashboard = () => {
   };
 
   return (
-    <>
-      <AppLayout>
-        <Grid style={{ padding: "10px" }}>
-          {/* Center Sidebar  */}
-          <Grid.Column stretched width={12}>
-            <Segment>
-              <h1>
-                Welcome,{" "}
-                {authData.username.charAt(0).toUpperCase() +
-                  authData.username.slice(1)}
-              </h1>
-            </Segment>
+    <AppLayout>
+      <Grid style={{ padding: "10px" }}>
+        {/* Center Sidebar  */}
+        <Grid.Column stretched width={12}>
+          <Segment>
+            <h1>
+              Welcome,{" "}
+              {authData.username.charAt(0).toUpperCase() +
+                authData.username.slice(1)}
+            </h1>
+          </Segment>
 
-            {/* Campaign Overview Segment */}
-            <Segment>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <h2>Campaign Overview</h2>
-                <Button color="green" onClick={openModal}>
-                  <Icon name="plus" />
-                  Create New Campaign
-                </Button>
-              </div>
-              <Table celled>
-                <Table.Header>
-                  <Table.Row>
-                    <Table.HeaderCell>Campaign Name</Table.HeaderCell>
-                    <Table.HeaderCell>Status</Table.HeaderCell>
-                    <Table.HeaderCell>Impressions</Table.HeaderCell>
-                    <Table.HeaderCell>Clicks</Table.HeaderCell>
-                    <Table.HeaderCell>Conversions</Table.HeaderCell>
-                    <Table.HeaderCell>Budget(N$)</Table.HeaderCell>
-                    <Table.HeaderCell>Actions</Table.HeaderCell>
-                  </Table.Row>
-                </Table.Header>
-
-                <Table.Body>
-                  {/* Replace this section with dynamic campaign data */}
-                  {campaigns.map((campaign) => (
-                    <Table.Row key={campaign._id}>
-                      <Table.Cell>{campaign.name}</Table.Cell>
-
-                      <Table.Cell>{campaign.status}</Table.Cell>
-                      <Table.Cell>{campaign.impressions}</Table.Cell>
-                      <Table.Cell>{campaign.clicks}</Table.Cell>
-                      <Table.Cell>{campaign.conversions}</Table.Cell>
-                      <Table.Cell>{campaign.budget}</Table.Cell>
-                      <Table.Cell>
-                        <Button size="small">Edit</Button>
-                        <Button size="small">Pause</Button>
-                      </Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table>
-            </Segment>
-
-            {/* Performance Analytics Segment */}
-            <Segment>
-              <h2>Performance Analytics</h2>
-              <Grid>
-                <Grid.Row>
-                  <Grid.Column width={8}>
-                    <h4>Clicks Over Time</h4>
-                    <Line data={clicksData} />
-                  </Grid.Column>
-                  <Grid.Column width={8}>
-                    <h4>Conversion Rate Over Time</h4>
-                    <Bar data={conversionRateData} />
-                  </Grid.Column>
-                </Grid.Row>
-              </Grid>
-            </Segment>
-          </Grid.Column>
-
-          {/* Right Sidebar */}
-          <Grid.Column width={4}>
+          {/* Campaign Overview Segment */}
+          <Segment>
             <div
               style={{
-                position: "-webkit-sticky",
-                position: "sticky",
-                top: 70,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              <Segment>
-                <h2>Notifications</h2>
-                <p>
-                  Your campaign "Example Campaign" is nearing its budget limit.
-                </p>
-                <p>
-                  Your campaign "Example Campaign" is nearing its budget limit.
-                </p>
-                <p>
-                  Your campaign "Example Campaign" is nearing its budget limit.
-                </p>
-
-                {/* More notifications */}
-              </Segment>
+              <h2>Campaign Overview</h2>
+              <Button color="green" onClick={openModal}>
+                <Icon name="plus" />
+                Create New Campaign
+              </Button>
             </div>
-          </Grid.Column>
-          <AS_MODAL
-            open={isModalOpen}
-            onClose={closeModal}
-            header="Create New Campaign"
-            content={<CampaignForm handleSubmit={handleCreateCampaign} />}
-            handleCreateCampaign={handleCreateCampaign}
-          />
-        </Grid>
-      </AppLayout>
-    </>
+
+            <AS_TABLE
+              rowKey="id"
+              columns={columns}
+              dataSource={campaigns.map((campaign) => ({
+                ...campaign,
+                key: campaign._id,
+              }))}
+            />
+          </Segment>
+
+          {/* Performance Analytics Segment */}
+          <Segment>
+            <h2>Performance Analytics</h2>
+            <Grid>
+              <Grid.Row>
+                <Grid.Column width={8}>
+                  <h4>Clicks Over Time</h4>
+                  <Line data={clicksData} />
+                </Grid.Column>
+                <Grid.Column width={8}>
+                  <h4>Conversion Rate Over Time</h4>
+                  <Bar data={conversionRateData} />
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </Segment>
+        </Grid.Column>
+
+        {/* Right Sidebar */}
+        <Grid.Column width={4}>
+          <div
+            style={{
+              position: "-webkit-sticky",
+              position: "sticky",
+              top: 70,
+            }}
+          >
+            <Segment>
+              <h2>Notifications</h2>
+              <p>
+                Your campaign "Example Campaign" is nearing its budget limit.
+              </p>
+              <p>
+                Your campaign "Example Campaign" is nearing its budget limit.
+              </p>
+              <p>
+                Your campaign "Example Campaign" is nearing its budget limit.
+              </p>
+
+              {/* More notifications */}
+            </Segment>
+          </div>
+        </Grid.Column>
+        <AS_MODAL
+          open={isModalOpen}
+          onClose={closeModal}
+          header="Create New Campaign"
+          content={
+            <CampaignForm
+              handleSubmit={handleCreateCampaign}
+              onClose={closeModal}
+            />
+          }
+          handleCreateCampaign={handleCreateCampaign}
+        />
+      </Grid>
+    </AppLayout>
   );
 };
 

@@ -17,7 +17,7 @@ import { useAuth } from "../context/AuthContext";
 
 function AdminDashboard() {
   const [users, setUsers] = useState([]);
-  const apiService = new APIService("http://localhost:5000/api");
+  const apiService = new APIService();
   const { authData } = useAuth();
 
   useEffect(() => {
@@ -25,7 +25,7 @@ function AdminDashboard() {
     return () => subscription.unsubscribe(); // Clean up subscription
   }, []);
 
-  // Mock data - replace with your data fetching logic
+  // Mock data - replace with actu data fetching logic
   const financialSummary = {
     totalRevenue: 12000,
     totalPayout: 8000,
