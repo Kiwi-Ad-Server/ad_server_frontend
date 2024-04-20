@@ -16,8 +16,17 @@ const userOptions = [
   { key: "publisher", text: "Publisher", value: "Publisher" },
 ];
 
+const platformTypeOptions = [
+  { key: "blog", text: "Blog", value: "Blog" },
+  { key: "news", text: "News Site", value: "News Site" },
+  { key: "forum", text: "Forum", value: "Forum" },
+  { key: "ecommerce", text: "E-commerce", value: "E-commerce" },
+  { key: "other", text: "Other", value: "Other" },
+];
+
 const Register = () => {
   const [userType, setUserType] = useState("Advertiser");
+  const [platformType, setPlatformType] = useState("");
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -56,10 +65,12 @@ const Register = () => {
 
   const handleDropdownChange = (e, { value }) => setUserType(value);
 
+  const handlePlatformTypeChange = (e, { value }) => setPlatformType(value);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(""); // Clear previous errors
-    const filteredData = { ...formData, role: userType };
+    const filteredData = { ...formData, role: userType, platformType };
     try {
       await register(filteredData);
       navigate(
@@ -68,7 +79,9 @@ const Register = () => {
           : "/publisher-dashboard"
       );
     } catch (registrationError) {
-      setError(registrationError.message || "Registration failed. Please try again.");
+      setError(
+        registrationError.message || "Registration failed. Please try again."
+      );
     }
   };
 
@@ -88,7 +101,9 @@ const Register = () => {
   return (
     <Grid textAlign="center" style={{ height: "100vh" }} verticalAlign="middle">
       <Grid.Column style={{ maxWidth: 450 }}>
-        <Header as="h1" color="teal" textAlign="center">Register</Header>
+        <Header as="h1" color="teal" textAlign="center">
+          Register
+        </Header>
         <Form size="large" onSubmit={handleSubmit}>
           <Segment stacked>
             <Form.Input
@@ -127,6 +142,7 @@ const Register = () => {
               value={userType}
               options={userOptions}
               onChange={handleDropdownChange}
+              style={{ marginBottom: "1em" }}
             />
             {userType === "Advertiser" && (
               <>
@@ -162,6 +178,15 @@ const Register = () => {
                   value={formData.platformName}
                   onChange={handleInputChange}
                 />
+                <Dropdown
+                  fluid
+                  placeholder="Select Platform Type"
+                  selection
+                  value={platformType}
+                  options={platformTypeOptions}
+                  onChange={handlePlatformTypeChange}
+                  style={{ marginBottom: "1em" }}
+                />
                 <Form.Input
                   fluid
                   name="websiteUrl"
@@ -171,15 +196,21 @@ const Register = () => {
                   value={formData.websiteUrl}
                   onChange={handleInputChange}
                 />
+
                 {/* Additional Publisher fields */}
               </>
             )}
             {error && <Message error>{error}</Message>}
-            <Button color="teal" fluid size="large">Register</Button>
+            <Button color="teal" fluid size="large">
+              Register
+            </Button>
           </Segment>
         </Form>
         <Message>
-          Already have an account? <a href="" onClick={() => navigate("/login")}>Login here</a>
+          Already have an account?{" "}
+          <a href="" onClick={() => navigate("/login")}>
+            Login here
+          </a>
         </Message>
       </Grid.Column>
     </Grid>
