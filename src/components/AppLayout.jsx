@@ -27,22 +27,6 @@ const AppLayout = ({ children }) => {
         icon: <Icon name="home" />,
         path: "/admin-dashboard",
       },
-      {
-        name: "User Management",
-        icon: <Icon name="users" />,
-        path: "/admin-users",
-      },
-      {
-        name: "Financial Reports",
-        icon: <Icon name="chart line" />,
-        path: "/admin-financials",
-      },
-      {
-        name: "System Settings",
-        icon: <Icon name="setting" />,
-        path: "/admin-settings",
-      },
-      // Other admin specific menu items...
     ],
     [USER_ROLES.Advertiser]: [
       {
@@ -50,27 +34,6 @@ const AppLayout = ({ children }) => {
         icon: <Icon name="home" />,
         path: "/advertiser-dashboard",
       },
-      {
-        name: "Adverts",
-        icon: <Icon name="buysellads" />,
-        path: "/advertiser-adverts",
-      },
-      {
-        name: "Campaigns",
-        icon: <Icon name="bullhorn" />,
-        path: "/advertiser-campaigns",
-      },
-      {
-        name: "Analytics",
-        icon: <Icon name="chart bar" />,
-        path: "/advertiser-analytics",
-      },
-      {
-        name: "Settings",
-        icon: <Icon name="setting" />,
-        path: "/advertiser-settings",
-      },
-      // Add more as needed...
     ],
     [USER_ROLES.Publisher]: [
       {

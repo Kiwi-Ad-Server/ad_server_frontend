@@ -1,8 +1,8 @@
+// Import necessary components and hooks
 import React, { useEffect, useState } from "react";
 import { Line, Bar } from "react-chartjs-2";
-import { Button, Grid, Icon, Message, Segment, Table } from "semantic-ui-react";
+import { Button, Grid, Icon, Popup, Segment } from "semantic-ui-react";
 import { useAuth } from "../context/AuthContext";
-import { fetchCampaigns, createCampaign } from "../services/campaignService";
 import AS_MODAL from "../shared/AS_MODAL";
 import AS_TABLE from "../shared/AS_TABLE";
 import CampaignForm from "./Forms/CampaignForm";
@@ -20,6 +20,7 @@ import {
   BarElement,
 } from "chart.js";
 
+// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -31,6 +32,7 @@ ChartJS.register(
   BarElement
 );
 
+// Define sample data for charts
 const clicksData = {
   labels: ["January", "February", "March", "April", "May", "June"],
   datasets: [
@@ -71,6 +73,7 @@ const conversionRateData = {
   ],
 };
 
+// Define columns configuration for the table
 const columns = [
   {
     title: "Campaign Name",
@@ -109,53 +112,101 @@ const columns = [
     key: "actions",
     render: (_, record) => (
       <Button.Group size="small">
-        <Button>Edit</Button>
-        <Button>Pause</Button>
+        <Popup
+          content="Pause campaign"
+          trigger={<Button icon="pause" />}
+          size="small"
+          position="top left"
+        />
+        <Popup
+          content="Edit campaign"
+          trigger={<Button icon="edit" />}
+          size="small"
+          position="top center"
+        />
+        <Popup
+          content="Delete campaign"
+          trigger={<Button icon="trash" />}
+          size="small"
+          position="top right"
+        />
       </Button.Group>
     ),
   },
 ];
 
 const AdvertiserDashboard = () => {
-  const [campaigns, setCampaigns] = useState([]);
+  // State and hooks
   const apiService = new APIService();
   const { authData } = useAuth();
+  const [campaigns, setCampaigns] = useState([]);
+  const [adPlacementOptions, setAdPlacementOptions] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Fetch data on component mount
   useEffect(() => {
-    const subscription = apiService.subscribeToData("campaigns", setCampaigns);
-    return () => subscription.unsubscribe();
+    fetchData();
+    fetchAdPlacements();
   }, []);
 
-  const handleCreateCampaign = async (campaignData) => {
+  // Function to fetch campaigns data
+  const fetchData = async () => {
     try {
-      // Call the createCampaign service function
-      await createCampaign(campaignData);
-  
-      // Refetch campaigns to update the list
-      const updatedCampaigns = await fetchCampaigns();
-      setCampaigns(updatedCampaigns);
-  
-      // Close the modal
-      setIsModalOpen(false);
+      // Set loading state to true
+      setCampaigns([]);
+      // Fetch data from API service
+      const data = await apiService.fetchData("campaigns");
+      // Update state with fetched data
+      setCampaigns(data);
     } catch (error) {
-      console.error("Error creating campaign:", error);
-      // Handle error (e.g., show error message)
+      console.error("Error fetching campaigns:", error);
     }
   };
+   // Function to fetch ad placements data
+   const fetchAdPlacements = async () => {
+    try {
+      const response = await apiService.fetchData("ad-placements");
+      const options = response.map((placement) => ({
+        key: placement._id,
+        text: placement.name,
+        value: placement._id,
+      }));
+      setAdPlacementOptions(options);
+    } catch (error) {
+      console.error("Error fetching ad placements:", error);
+    }
+  };
+
+  // Function to handle creation of a new campaign
+  const handleCreateCampaign = async (campaignData) => {
+    try {
+      // Post campaign data to API service
+      await apiService.postData("campaigns", campaignData);
+      // Close the modal
+      setIsModalOpen(false);
+      // Fetch updated data after creating a new campaign
+      fetchData();
+    } catch (error) {
+      console.error("Error creating campaign:", error);
+    }
+  };
+
+  // Function to open the modal
   const openModal = () => {
     setIsModalOpen(true);
   };
 
+  // Function to close the modal
   const closeModal = () => {
     setIsModalOpen(false);
   };
 
+  // Render component
   return (
     <AppLayout>
       <Grid style={{ padding: "10px" }}>
-        {/* Center Sidebar  */}
-        <Grid.Column stretched width={12}>
+        {/* Center Sidebar */}
+        <Grid.Column width={12}>
           <Segment>
             <h1>
               Welcome,{" "}
@@ -174,20 +225,39 @@ const AdvertiserDashboard = () => {
               }}
             >
               <h2>Campaign Overview</h2>
-              <Button color="green" onClick={openModal}>
-                <Icon name="plus" />
-                Create New Campaign
-              </Button>
+              <div>
+                {/* Refresh button with a popup */}
+                <Popup
+                  content="Refresh table"
+                  trigger={<Button icon="refresh" onClick={fetchData} />}
+                  size="mini"
+                />
+                {/* Button to open modal for creating a new campaign */}
+                <Button color="green" onClick={openModal}>
+                  <Icon name="plus" />
+                  Create New Campaign
+                </Button>
+              </div>
             </div>
 
-            <AS_TABLE
-              rowKey="id"
-              columns={columns}
-              dataSource={campaigns.map((campaign) => ({
-                ...campaign,
-                key: campaign._id,
-              }))}
-            />
+            {/* Campaign table */}
+            <Segment>
+              <AS_TABLE
+                rowKey="id"
+                columns={columns}
+                dataSource={
+                  campaigns &&
+                  campaigns.map((campaign) => ({
+                    ...campaign,
+                    key: campaign._id,
+                  }))
+                }
+                // Show loading spinner while data is being fetched
+                loading={!campaigns.length}
+                // Responsive table
+                responsive
+              />
+            </Segment>
           </Segment>
 
           {/* Performance Analytics Segment */}
@@ -196,10 +266,12 @@ const AdvertiserDashboard = () => {
             <Grid>
               <Grid.Row>
                 <Grid.Column width={8}>
+                  {/* Chart for Clicks Over Time */}
                   <h4>Clicks Over Time</h4>
                   <Line data={clicksData} />
                 </Grid.Column>
                 <Grid.Column width={8}>
+                  {/* Chart for Conversion Rate Over Time */}
                   <h4>Conversion Rate Over Time</h4>
                   <Bar data={conversionRateData} />
                 </Grid.Column>
@@ -219,6 +291,7 @@ const AdvertiserDashboard = () => {
           >
             <Segment>
               <h2>Notifications</h2>
+              {/* Placeholder notifications */}
               <p>
                 Your campaign "Example Campaign" is nearing its budget limit.
               </p>
@@ -228,11 +301,12 @@ const AdvertiserDashboard = () => {
               <p>
                 Your campaign "Example Campaign" is nearing its budget limit.
               </p>
-
               {/* More notifications */}
             </Segment>
           </div>
         </Grid.Column>
+
+        {/* Modal for creating a new campaign */}
         <AS_MODAL
           open={isModalOpen}
           onClose={closeModal}
@@ -241,6 +315,7 @@ const AdvertiserDashboard = () => {
             <CampaignForm
               handleSubmit={handleCreateCampaign}
               onClose={closeModal}
+              adPlacementOptions={adPlacementOptions}
             />
           }
           handleCreateCampaign={handleCreateCampaign}

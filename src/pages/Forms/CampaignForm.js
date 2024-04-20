@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { Form, Button, Modal, Grid } from "semantic-ui-react";
+import { Form, Button, Header, Modal, Grid, Popup } from "semantic-ui-react";
+
 import AS_NOTIFY from "../../shared/AS_NOTIFY";
 import APIService from "../../services/api.service";
+import FileUploadComponent from "../../components/FileUploadComponent";
 
 const objectiveOptions = [
   { key: "awareness", text: "Brand Awareness", value: "Brand Awareness" },
@@ -10,7 +12,7 @@ const objectiveOptions = [
   { key: "education", text: "Education", value: "Education" },
 ];
 
-const CampaignDetailsForm = ({ onClose }) => {
+const CampaignDetailsForm = ({ onClose, adPlacementOptions }) => {
   const [campaignDetails, setCampaignDetails] = useState({
     name: "",
     objective: "",
@@ -20,12 +22,21 @@ const CampaignDetailsForm = ({ onClose }) => {
     ageRange: "",
     interests: "",
     duration: { start: "", end: "" },
+    adCreative: null,
+    adPlacements: [],
   });
 
   const apiService = new APIService();
 
   const handleChange = (e, { name, value }) => {
     setCampaignDetails({ ...campaignDetails, [name]: value });
+  };
+
+  const handleAdPlacementChange = (selectedPlacements) => {
+    setCampaignDetails({
+      ...campaignDetails,
+      adPlacements: selectedPlacements,
+    });
   };
 
   const submitForm = async () => {
@@ -39,6 +50,10 @@ const CampaignDetailsForm = ({ onClose }) => {
     } catch (error) {
       console.error("Error creating campaign:", error);
     }
+  };
+
+  const handleFileUpload = (url) => {
+    setCampaignDetails({ ...campaignDetails, adCreative: url }); // Set the adCreative URL in the state
   };
 
   return (
@@ -125,6 +140,32 @@ const CampaignDetailsForm = ({ onClose }) => {
                 onChange={handleChange}
                 placeholder="e.g., sports, music"
               />
+            </Grid.Column>
+          </Grid.Row>
+
+          <Grid.Row columns={2}>
+            <Grid.Column>
+              {/* New field for ad placement selection */}
+              <Popup
+                trigger={
+                  <Form.Dropdown
+                    fluid
+                    multiple
+                    selection
+                    label="Ad Placements"
+                    name="adPlacements"
+                    options={adPlacementOptions}
+                    value={campaignDetails.adPlacements}
+                    onChange={(e, { value }) => handleAdPlacementChange(value)}
+                    placeholder="Select Ad Placements"
+                  />
+                }
+                content="Here you can select the placements for your ads. The selected placements will determine where your ads will be displayed on websites."
+              />
+            </Grid.Column>
+            {/* New field for ad creative upload */}
+            <Grid.Column>
+              <FileUploadComponent onFileUploaded={handleFileUpload} />
             </Grid.Column>
           </Grid.Row>
 

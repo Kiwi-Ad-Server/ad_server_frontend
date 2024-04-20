@@ -3,7 +3,7 @@ import { Button, Input, Space, Table, Tag } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 
-const AS_TABLE = ({ columns, dataSource }) => {
+const AS_TABLE = ({ columns, dataSource, loading }) => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
@@ -96,23 +96,33 @@ const AS_TABLE = ({ columns, dataSource }) => {
       return a[dataIndex].localeCompare(b[dataIndex]);
     },
   });
-   // Define the pagination configuration
-  const paginationConfig = {
-    defaultPageSize: 3, // Default number of items per page
-    showSizeChanger: true, // Allow changing items per page
-    pageSizeOptions: ['10', '20', '30', '50'], // Page size options
-  };
+
   // Apply getColumnSearchProps to the columns that need search functionality
   const enhancedColumns = columns.map((col) => {
     const searchProps = col.searchable
       ? getColumnSearchProps(col.dataIndex)
       : {};
     const sortProps = col.sortable ? getColumnSortProps(col.dataIndex) : {};
-    return { ...col, ...searchProps, ...sortProps };
+
+    // If it's the last column, make it fixed
+    const fixedProps = col.key === "actions" ? { fixed: "right" } : {};
+
+    return { ...col, ...searchProps, ...sortProps, ...fixedProps };
   });
 
-
-  return <Table columns={enhancedColumns} dataSource={dataSource}  pagination={paginationConfig} />;
+  return (
+    <Table
+      columns={enhancedColumns}
+      dataSource={dataSource}
+      loading={loading}
+      pagination={{
+        defaultPageSize: 3,
+        showSizeChanger: false,
+        pageSizeOptions: ["3", "20", "30", "50"],
+      }}
+      scroll={{ x: true }}
+    />
+  );
 };
 
 export default AS_TABLE;

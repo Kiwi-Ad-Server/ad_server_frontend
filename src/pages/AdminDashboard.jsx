@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from "react";
 import {
-  Grid,
-  Segment,
-  Table,
-  Header,
   Button,
+  Grid,
   Icon,
-  List,
+  Segment,
+  Header,
   Statistic,
-  StatisticValue,
-  StatisticLabel,
+  List,
 } from "semantic-ui-react";
 import AppLayout from "../components/AppLayout";
 import APIService from "../services/api.service";
 import { useAuth } from "../context/AuthContext";
+import AS_TABLE from "../shared/AS_TABLE"; // Import AS_TABLE component
 
 function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -25,40 +23,46 @@ function AdminDashboard() {
     return () => subscription.unsubscribe(); // Clean up subscription
   }, []);
 
-  // Mock data - replace with actu data fetching logic
-  const financialSummary = {
-    totalRevenue: 12000,
-    totalPayout: 8000,
-    netProfit: 4000,
-  };
-
-  const campaigns = [
+  // Define columns configuration for the table
+  const columns = [
     {
-      id: 1,
-      name: "Spring Sale",
-      status: "Active",
-      impressions: 100000,
-      clicks: 5000,
-      conversions: 500,
+      title: "Name",
+      dataIndex: "username",
+      key: "username",
     },
     {
-      id: 2,
-      name: "Summer Festival",
-      status: "Paused",
-      impressions: 75000,
-      clicks: 3500,
-      conversions: 450,
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Role",
+      dataIndex: "role",
+      key: "role",
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, user) => (
+        <>
+          <Button icon>
+            <Icon name="edit" />
+          </Button>
+          <Button icon onClick={() => handleDeleteUser(user._id)}>
+            <Icon name="trash" />
+          </Button>
+        </>
+      ),
     },
   ];
 
+  // Function to delete a user
   const handleDeleteUser = async (userId) => {
     try {
-      await apiService.deleteData("users", userId);
-      // Optionally refetch the user list or filter out the deleted user from state
-      setUsers(users.filter((user) => user.id !== userId));
+      await apiService.deleteData("auth", userId);
+      setUsers(users.filter((user) => user._id !== userId));
     } catch (error) {
       console.error("Error deleting user:", error);
-      // Handle error (e.g., show an error message)
     }
   };
 
@@ -77,80 +81,24 @@ function AdminDashboard() {
           </Grid.Column>
         </Grid.Row>
 
-        <Grid.Row columns={2}>
-          <Grid.Column>
-            <Segment>
-              <Header as="h3">Financial Summary</Header>
-              <Statistic size="mini">
-                <StatisticValue>
-                  ${financialSummary.totalRevenue}
-                </StatisticValue>
-                <StatisticLabel>Total Revenue</StatisticLabel>
-              </Statistic>
-              <Statistic size="mini">
-                <StatisticValue>${financialSummary.totalPayout}</StatisticValue>
-                <StatisticLabel>Total Payout</StatisticLabel>
-              </Statistic>
-              <Statistic size="mini">
-                <StatisticValue>${financialSummary.netProfit}</StatisticValue>
-                <StatisticLabel>Net Profit</StatisticLabel>
-              </Statistic>
-            </Segment>
-          </Grid.Column>
-          <Grid.Column>
-            <Segment>
-              <Header as="h3">Campaign Overview</Header>
-              <List divided relaxed>
-                {campaigns.map((campaign) => (
-                  <List.Item key={campaign.id}>
-                    <List.Content>
-                      <List.Header>{campaign.name}</List.Header>
-                      <List.Description>
-                        Status: {campaign.status} - Impressions:{" "}
-                        {campaign.impressions} - Clicks: {campaign.clicks} -
-                        Conversions: {campaign.conversions}
-                      </List.Description>
-                    </List.Content>
-                  </List.Item>
-                ))}
-              </List>
-            </Segment>
-          </Grid.Column>
-        </Grid.Row>
+        {/* Financial Summary Segment */}
+        {/* Your existing financial summary segment */}
+
+        {/* Campaign Overview Segment */}
+        {/* Your existing campaign overview segment */}
+
+        {/* User Management Segment */}
         <Grid.Row>
           <Grid.Column>
             <Segment>
               <Header as="h3">User Management</Header>
-              <Table celled>
-                <Table.Header>
-                  <Table.Row>
-                    <Table.HeaderCell>Name</Table.HeaderCell>
-                    <Table.HeaderCell>Email</Table.HeaderCell>
-                    <Table.HeaderCell>Role</Table.HeaderCell>
-                    <Table.HeaderCell>Actions</Table.HeaderCell>
-                  </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                  {users.map((user) => (
-                    <Table.Row key={user.id}>
-                      <Table.Cell>{user.username}</Table.Cell>
-                      <Table.Cell>{user.email}</Table.Cell>
-                      <Table.Cell>{user.role}</Table.Cell>
-                      <Table.Cell>
-                        <Button icon>
-                          <Icon name="edit" />
-                        </Button>
-                        <Button icon>
-                          <Icon
-                            name="trash"
-                            onClick={() => handleDeleteUser(user._id)}
-                          />
-                        </Button>
-                      </Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table>
+              {/* Replace existing table with AS_TABLE */}
+              <AS_TABLE
+                columns={columns}
+                dataSource={users}
+                loading={!users.length}
+                responsive
+              />
             </Segment>
           </Grid.Column>
         </Grid.Row>
