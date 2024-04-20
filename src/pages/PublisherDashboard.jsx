@@ -10,17 +10,56 @@ import {
   StatisticValue,
   StatisticLabel,
   Table,
+  Form,
 } from "semantic-ui-react";
 import AppLayout from "../components/AppLayout";
 import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
+import { Link } from "react-router-dom"; // Import Link
 
 function PublisherDashboard() {
   const { authData } = useAuth();
+  const [showForm, setShowForm] = useState(false); // State to control form visibility
+
   // Mock data for ad zones and performance
   const adZones = [
     { id: 1, name: "Homepage Banner", type: "Banner", status: "Active" },
     { id: 2, name: "Sidebar Ad", type: "Video", status: "Active" },
   ];
+
+   // Function to handle the "Add New Ad Zone" button click
+ const handleAddNewAdZone = () => {
+  setShowForm(!showForm); // Toggle form visibility
+};
+
+const handleFormSubmit = (newRequest) => {
+  requests(prevRequests => [...prevRequests, newRequest]);
+  setShowForm(false);
+};
+
+const AdZoneForm = () => (
+  <Form onSubmit={(e) => {
+    e.preventDefault();
+    const newRequest = {
+      id: requests.length + 1,
+      date: new Date().toISOString().split('T')[0],
+      type: "New Ad Zone",
+      status: "Pending",
+    };
+    handleFormSubmit(newRequest);
+  }}>
+    <Form.Field>
+      <label>Name</label>
+      <input placeholder="Enter Ad Zone Name"  />
+      <label>Type</label>
+      <input placeholder="Banner"/>
+      <label>Website Name</label>
+      <input placeholder="Foodie Tips" />
+
+    </Form.Field>
+    <Button type="submit">Submit</Button>
+  </Form>
+);
 
   const performanceSummary = {
     totalImpressions: 500000,
@@ -50,6 +89,8 @@ function PublisherDashboard() {
                 {authData.username.charAt(0).toUpperCase() +
                   authData.username.slice(1)}
               </h1>
+               {/* Add the link to the Publisher Dashboard */}
+               <Link to="/admin-dashboard">Go to Admin Dashboard</Link>
             </Segment>
           </Grid.Column>
         </Grid.Row>
@@ -75,7 +116,19 @@ function PublisherDashboard() {
                   </List.Item>
                 ))}
               </List>
-              <Button primary>Add New Ad Zone</Button>
+              <Grid.Row>
+          <Grid.Column>
+            <Segment>
+              <Header as="h3">Ad Zones</Header>
+              <List divided relaxed>
+                {/* Your existing List of ad zones... */}
+              </List>
+              <Button primary onClick={handleAddNewAdZone}>Add New Ad Zone</Button>
+              {showForm && <AdZoneForm />}
+            </Segment>
+          </Grid.Column>
+        </Grid.Row>
+
             </Segment>
           </Grid.Column>
           <Grid.Column>
