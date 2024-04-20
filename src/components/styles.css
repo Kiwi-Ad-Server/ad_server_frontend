@@ -1,0 +1,19 @@
+/* Add responsive styles for UserSidebar */
+.user-sidebar {
+    width: 300px; /* Adjust width as needed */
+  }
+  
+  /* Hide the sidebar for mobile devices */
+  @media screen and (max-width: 767px) {
+    .user-sidebar {
+      display: none;
+    }
+  }
+  
+  /* Show the sidebar for tablets and larger devices */
+  @media screen and (min-width: 768px) {
+    .user-sidebar {
+      display: block;
+    }
+  }
+  
