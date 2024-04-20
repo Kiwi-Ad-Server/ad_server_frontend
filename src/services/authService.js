@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Axios instance specific to the auth service
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000/api/auth/",
+  baseURL: "https://kiwiadserver.onrender.com/api/auth/",
   withCredentials: true, // Assuming credentials are needed for all requests
 });
 
