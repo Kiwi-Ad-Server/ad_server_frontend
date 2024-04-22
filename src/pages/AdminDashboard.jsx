@@ -14,7 +14,6 @@ import {
 import AppLayout from "../components/AppLayout";
 import APIService from "../services/api.service";
 import { useAuth } from "../context/AuthContext";
-import { Link } from "react-router-dom"; // Import Link from react-router-dom
 
 function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -74,8 +73,6 @@ function AdminDashboard() {
                 {authData.username.charAt(0).toUpperCase() +
                   authData.username.slice(1)}
               </h1>
-               {/* Add the link to the Publisher Dashboard */}
-               <Link to="/publisher-dashboard">Go to Publisher Dashboard</Link>
             </Segment>
           </Grid.Column>
         </Grid.Row>
