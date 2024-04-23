@@ -32,48 +32,7 @@ ChartJS.register(
   BarElement
 );
 
-// Define sample data for charts
-const clicksData = {
-  labels: ["January", "February", "March", "April", "May", "June"],
-  datasets: [
-    {
-      label: "Clicks",
-      data: [1200, 1900, 800, 1600, 2000, 1500],
-      fill: false,
-      borderColor: "rgb(75, 192, 192)",
-      tension: 0.1,
-    },
-  ],
-};
-
-const conversionRateData = {
-  labels: ["January", "February", "March", "April", "May", "June"],
-  datasets: [
-    {
-      label: "Conversion Rate",
-      data: [2.5, 3.8, 2.1, 3.4, 4.0, 3.2], // Assuming these are percentages
-      backgroundColor: [
-        "rgba(255, 99, 132, 0.2)",
-        "rgba(54, 162, 235, 0.2)",
-        "rgba(255, 206, 86, 0.2)",
-        "rgba(75, 192, 192, 0.2)",
-        "rgba(153, 102, 255, 0.2)",
-        "rgba(255, 159, 64, 0.2)",
-      ],
-      borderColor: [
-        "rgba(255, 99, 132, 1)",
-        "rgba(54, 162, 235, 1)",
-        "rgba(255, 206, 86, 1)",
-        "rgba(75, 192, 192, 1)",
-        "rgba(153, 102, 255, 1)",
-        "rgba(255, 159, 64, 1)",
-      ],
-      borderWidth: 1,
-    },
-  ],
-};
-
-// Define columns configuration for the table
+// columns configuration for the table
 const columns = [
   {
     title: "Campaign Name",
@@ -143,27 +102,58 @@ const AdvertiserDashboard = () => {
   const [adPlacementOptions, setAdPlacementOptions] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [clicksData, setClicksData] = useState({ labels: [], datasets: [] });
+  const [conversionRateData, setConversionRateData] = useState({
+    labels: [],
+    datasets: [],
+  });
+
   // Fetch data on component mount
   useEffect(() => {
     fetchData();
     fetchAdPlacements();
+    fetchPerformanceData();
   }, []);
 
   // Function to fetch campaigns data
+  // const fetchData = async () => {
+  //   try {
+  //     // Set loading state to true
+  //     setCampaigns([]);
+  //     // Fetch data from API service
+  //     const data = await apiService.fetchData("campaigns");
+
+  //     setCampaigns(data);
+  //   } catch (error) {
+  //     console.error("Error fetching campaigns:", error);
+  //   }
+  // };
+
   const fetchData = async () => {
     try {
-      // Set loading state to true
       setCampaigns([]);
-      // Fetch data from API service
-      const data = await apiService.fetchData("campaigns");
-      // Update state with fetched data
-      setCampaigns(data);
+      const campaignsData = await apiService.fetchData("campaigns");
+      setCampaigns(campaignsData);
+
+      // Fetch clicks and conversion rate data for the first campaign 
+      if (campaignsData.length > 0) {
+        const campaignId = campaignsData[0]._id;
+        const clicks = await apiService.fetchData(
+          `campaigns/clicks/${campaignId}`
+        );
+        const conversionRate = await apiService.fetchData(
+          `campaigns/${campaignId}/conversion-rate`
+        );
+        setClicksData(clicks);
+        setConversionRateData(conversionRate);
+      }
     } catch (error) {
-      console.error("Error fetching campaigns:", error);
+      console.error("Error fetching data:", error);
     }
   };
-   // Function to fetch ad placements data
-   const fetchAdPlacements = async () => {
+
+  // Function to fetch ad placements data
+  const fetchAdPlacements = async () => {
     try {
       const response = await apiService.fetchData("ad-placements");
       const options = response.map((placement) => ({
@@ -177,7 +167,60 @@ const AdvertiserDashboard = () => {
     }
   };
 
-  // Function to handle creation of a new campaign
+  const fetchPerformanceData = async () => {
+    try {
+      // Fetch actual clicks data from the API
+      const clicksResponse = await apiService.fetchData("campaigns/clicks");
+      const clicksChartData = {
+        labels: clicksResponse.map((item) => item.month),
+        datasets: [
+          {
+            label: "Clicks",
+            data: clicksResponse.map((item) => item.clicks),
+            fill: false,
+            borderColor: "rgb(75, 192, 192)",
+            tension: 0.1,
+          },
+        ],
+      };
+      setClicksData(clicksChartData);
+
+      // Fetch actual conversion rate data from the API
+      const conversionRateResponse = await apiService.fetchData(
+        "conversion-rate"
+      );
+      const conversionRateChartData = {
+        labels: conversionRateResponse.map((item) => item.month),
+        datasets: [
+          {
+            label: "Conversion Rate",
+            data: conversionRateResponse.map((item) => item.conversionRate),
+            backgroundColor: [
+              "rgba(255, 99, 132, 0.2)",
+              "rgba(54, 162, 235, 0.2)",
+              "rgba(255, 206, 86, 0.2)",
+              "rgba(75, 192, 192, 0.2)",
+              "rgba(153, 102, 255, 0.2)",
+              "rgba(255, 159, 64, 0.2)",
+            ],
+            borderColor: [
+              "rgba(255, 99, 132, 1)",
+              "rgba(54, 162, 235, 1)",
+              "rgba(255, 206, 86, 1)",
+              "rgba(75, 192, 192, 1)",
+              "rgba(153, 102, 255, 1)",
+              "rgba(255, 159, 64, 1)",
+            ],
+            borderWidth: 1,
+          },
+        ],
+      };
+      setConversionRateData(conversionRateChartData);
+    } catch (error) {
+      console.error("Error fetching performance data:", error);
+    }
+  };
+  // create new campaign
   const handleCreateCampaign = async (campaignData) => {
     try {
       // Post campaign data to API service
@@ -191,17 +234,16 @@ const AdvertiserDashboard = () => {
     }
   };
 
-  // Function to open the modal
+  //  open the modal
   const openModal = () => {
     setIsModalOpen(true);
   };
 
-  // Function to close the modal
+  //  close the modal
   const closeModal = () => {
     setIsModalOpen(false);
   };
 
-  // Render component
   return (
     <AppLayout>
       <Grid style={{ padding: "10px" }}>
@@ -268,12 +310,12 @@ const AdvertiserDashboard = () => {
                 <Grid.Column width={8}>
                   {/* Chart for Clicks Over Time */}
                   <h4>Clicks Over Time</h4>
-                  <Line data={clicksData} />
+                  {clicksData && <Line data={clicksData} />}
                 </Grid.Column>
                 <Grid.Column width={8}>
                   {/* Chart for Conversion Rate Over Time */}
                   <h4>Conversion Rate Over Time</h4>
-                  <Bar data={conversionRateData} />
+                  {conversionRateData && <Bar data={conversionRateData} />}
                 </Grid.Column>
               </Grid.Row>
             </Grid>
