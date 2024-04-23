@@ -3,7 +3,7 @@ import axios from "axios";
 // Axios instance specific to the auth service
 const axiosInstance = axios.create({
   baseURL: "https://kiwiad-server-api.onrender.com/api/auth/",
-  withCredentials: true, 
+  withCredentials: true,
 });
 
 const authService = {
@@ -13,7 +13,6 @@ const authService = {
       const response = await axiosInstance.post("register", data);
       return response.data;
     } catch (error) {
-   
       throw new Error(error.response.data.message || "Registration failed");
     }
   },
@@ -39,10 +38,27 @@ const authService = {
   },
 
   // Async function to validate the current session
+  // Async function to validate the current session
   validateSession: async () => {
     try {
-      const response = await axiosInstance.get("validate-session");
-      return response.data.user; 
+      // Retrieve the authentication token from cookies
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="))
+        ?.split("=")[1];
+
+      if (!token) {
+        throw new Error("Authentication token not found");
+      }
+
+      // Include the authentication token in the request headers
+      const response = await axiosInstance.get("validate-session", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data.user; // Return the user data from the response
     } catch (error) {
       throw new Error(
         error.response.data.message || "Session validation failed"
